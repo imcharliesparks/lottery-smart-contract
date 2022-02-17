@@ -32,4 +32,12 @@ describe('Lottery Contract', () => {
         const players = await lotteryContract.methods.getPlayers().call()
         assert.equal(players[0], accounts[1])
     })
+
+    it('should allow multiple people to enter', async () => {
+        await lotteryContract.methods.enter().send({ from: accounts[2], value: web3Instance.utils.toWei('0.02', 'ether') })
+        await lotteryContract.methods.enter().send({ from: accounts[3], value: web3Instance.utils.toWei('0.02', 'ether') })
+        const players = await lotteryContract.methods.getPlayers().call()
+        assert.equal(players.length, 2)
+        assert.equal(players[1], accounts[3])
+    })
 })
