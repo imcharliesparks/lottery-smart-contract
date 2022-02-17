@@ -65,7 +65,11 @@ describe('Lottery Contract', () => {
             const addressBalance = await web3Instance.eth.getBalance(accounts[1])
             await lotteryContract.methods.pickWinner().send({ from: accounts[0] })
             const newWinningAddressBalance = await web3Instance.eth.getBalance(accounts[1])
+            const players = await lotteryContract.methods.getPlayers().call({ from: accounts[0] })
+            const newContractBalance = await lotteryContract.methods.getContractBalance().call({ from: accounts[0] })
             assert(Number(newWinningAddressBalance) > Number(addressBalance))
+            assert.equal(0, players.length)
+            assert.equal(0, newContractBalance)
         } catch (e) {
             assert(false)
         }
