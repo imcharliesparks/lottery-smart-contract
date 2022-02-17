@@ -40,4 +40,34 @@ describe('Lottery Contract', () => {
         assert.equal(players.length, 2)
         assert.equal(players[1], accounts[3])
     })
+
+    it('should not let you enter without providing at least `.01` ether', async () => {
+        try {
+            await lotteryContract.methods.enter().send({ from: accounts[1], value: web3Instance.utils.toWei('0.001', 'ether') })
+            assert(false)
+        } catch (e) {
+            assert(e)
+        }
+    })
+
+    it('should not let anyone other than the manager call `pickWinner`', async () => {
+        try {
+            await lotteryContract.methods.pickWinner().send({ from: accounts[1] })
+            assert(false)
+        } catch (e) {
+            assert(e)
+        }
+    })
+
+    it('should send money to the winner and resets the players array', async () => {
+        try {
+            await lotteryContract.methods.enter().send({ from: accounts[1], value: web3Instance.utils.toWei('2', 'ether') })
+            const addressBalance = await web3Instance.eth.getBalance(accounts[1])
+            await lotteryContract.methods.pickWinner().send({ from: accounts[0] })
+            const newWinningAddressBalance = await web3Instance.eth.getBalance(accounts[1])
+            assert(Number(newWinningAddressBalance) > Number(addressBalance))
+        } catch (e) {
+            assert(false)
+        }
+    })
 })
